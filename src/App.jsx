@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import axios from 'axios'
+import moment from 'moment-timezone'
 
 import { Button, Spinner, Nav, Navbar, Container, NavDropdown, Form } from 'react-bootstrap'
 import { Switch, FormGroup, FormControlLabel, Stack, Typography } from '@mui/material'
@@ -22,25 +23,26 @@ function App() {
   const [place, setPlace] = useState(localStorage.getItem('Place') || "La Romana, DO")
   const [weatherData, setWeatherData] = useState(null)
   const [loading, setLoading] = useState(true)
-  //const [loading, setLoading] = useState(false)
+  const [cityTime, setCityTime] = useState('')
 
 
   const GetWeather = async (s) => {
     if(!loading) setLoading(true)
     setLastSearch(s)
+    localStorage.setItem('Place', s)
     const api_key = 'f170fc3837ef3b55e61196c5b782e597';
     const { data } = await axios.get(`https://api.openweathermap.org/data/2.5/weather?q=${s}&units=${tempC ? 'metric' : 'imperial'}&appid=${api_key}`)
       try{
         setWeatherData(data)
+        const timezoneOffsetSeconds = data.timezone;
+        const timezoneOffsetHours = timezoneOffsetSeconds / 3600;
+        const currentTimeForCity = moment().utcOffset(timezoneOffsetHours);
+        setCityTime(currentTimeForCity.format('YYYY-MM-DD HH:mm:ss'))
         setLoading(false)
       }catch(error){
-        console.log('error', error);
-            setLoading(false)
+        console.log('Some error occured');
+        setLoading(false)
       }
-  }
-
-  const LookFor = async () => {
-    if(search.length > 0) GetWeather(search)
   }
 
   useEffect(() => {
@@ -67,8 +69,8 @@ function App() {
       </Navbar>
       <div id="div-as-main">
         <section id="searchContainer">
-          <input type="text" onChange={(e) => setSearch(e.target.value)} onKeyDown={(e) => {if(e.key === 'Enter') LookFor();}} placeholder="Search"/>
-          <img src="./search.png" alt="search" onClick={LookFor} />
+          <input type="text" onChange={(e) => setSearch(e.target.value)} onKeyDown={(e) => { if(e.key === 'Enter') GetWeather(search) }} placeholder="Search"/>
+          <img src="./search.png" alt="search" onClick={() => { if(search.length > 0) GetWeather(search) }} />
         </section>
         <main className="main">
           {
@@ -78,7 +80,7 @@ function App() {
                 </Spinner>
               ) :
               (
-                <Card data={weatherData} />
+                <Card data={weatherData} time={cityTime} />
               )
           }
         </main>

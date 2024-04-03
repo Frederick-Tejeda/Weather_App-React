@@ -20,12 +20,10 @@
   width: 100%;
   border: 1px solid black;
 }
-
 .weather-widget{
 	width: 100%;
 }
 .weather-panel {
-/*  background-image: url("https://unsplash.it/600/400?image=1043&blur");*/
   background-color: #000;
   background-size: cover;
   border-radius: 20px;
@@ -33,19 +31,14 @@
   overflow: hidden;
   position: relative;
   display: flex;
-  justify-content: space-around;
+  justify-content: space-between !important;
+  align-items: center;
   width: 100% !important;
-
-  small {
-    color: inherit;
-    font-size: 50%;
+  padding: 0px 5px !important;
+  div{
+    margin: 10px 0;
   }
   ul.forecast > li {
     border-top: 1px solid #fff;
-  }
-  .temperature {
-    & > span {
-        font-size: 2em;
-    }
   }
 }
